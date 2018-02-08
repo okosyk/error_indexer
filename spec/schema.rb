@@ -5,8 +5,13 @@ ActiveRecord::Schema.define do
     t.string :name
   end
 
-   create_table :patties, :force => true do |t|
-   	t.integer :double_hamburger_id,   null: false
+  create_table :patties, :force => true do |t|
+    t.integer :double_hamburger_id,   null: false
     t.string  :meat_type,             null: false
+  end
+
+  create_table :cheese_slices, :force => true do |t|
+    t.integer :double_hamburger_id,   null: false
+    t.string  :cheese_type,           null: false
   end
 end

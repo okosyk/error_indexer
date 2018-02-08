@@ -1,5 +1,6 @@
 require 'models/double_hamburger'
 require 'models/patty'
+require 'models/cheese_slice'
 
 RSpec.describe ErrorIndexer do
   #patties
@@ -9,10 +10,15 @@ RSpec.describe ErrorIndexer do
   let!(:vegeterian_patty) { Patty.new(meat_type: :chickpea) }
   let!(:additional_vegeterian_patty) { Patty.new(meat_type: :chickpea) }
 
+  #cheese slices
+  let!(:camambert_slice) { CheeseSlice.new(cheese_type: :camambert) }
+  let!(:feta) { CheeseSlice.new(cheese_type: :feta) }
+
   #burgers
-  let!(:nice_burger) { DoubleHamburger.new(patties: [chicken_patty, beef_patty]) }
-  let!(:vegeterian_burger) { DoubleHamburger.new(patties: [vegeterian_patty, additional_vegeterian_patty]) }
-  let!(:mixed_burger) { DoubleHamburger.new(patties: [chicken_patty, vegeterian_patty, beef_patty]) }
+  let!(:nice_burger) { DoubleHamburger.new(patties: [chicken_patty, beef_patty], cheese_slices: [camambert_slice, camambert_slice]) }
+  let!(:vegeterian_burger) { DoubleHamburger.new(patties: [vegeterian_patty, additional_vegeterian_patty], cheese_slices: [camambert_slice]) }
+  let!(:mixed_burger) { DoubleHamburger.new(patties: [chicken_patty, vegeterian_patty, beef_patty], cheese_slices: [camambert_slice]) }
+  let!(:burger_with_feta_cheese) { DoubleHamburger.new(patties: [chicken_patty], cheese_slices: [feta, feta]) }
 
   it "has a version number" do
     expect(ErrorIndexer::VERSION).not_to be nil
@@ -39,6 +45,17 @@ RSpec.describe ErrorIndexer do
     expect(mixed_burger.errors.messages.keys.map(&:to_s)).to match(
       [
         "patties.1.meat_type"
+      ]
+    )
+  end
+
+  it "doesnt index not markes for indexing associations" do
+    expect(burger_with_feta_cheese.valid?).to be(false)
+    expect(burger_with_feta_cheese.errors.count).to eq(1)
+
+    expect(burger_with_feta_cheese.errors.messages.keys.map(&:to_s)).to match(
+      [
+        "cheese_slices.cheese_type"
       ]
     )
   end
