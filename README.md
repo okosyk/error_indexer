@@ -1,38 +1,55 @@
 # ErrorIndexer
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/error_indexer`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Allows to index error messages on has many assoccitions.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'error_indexer'
+gem 'error_indexer', github: 'okosyk/error_indexer'
 ```
 
 And then execute:
 
     $ bundle
 
-Or install it yourself as:
-
-    $ gem install error_indexer
-
 ## Usage
 
-TODO: Write usage instructions here
+Just add `index_errors: true` to  your `has_many` association.
 
-## Development
+Example:
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+```ruby
+class DoubleHamburger < ActiveRecord::Base
+  has_many :patties, index_errors: true
+  accepts_nested_attributes_for :patties
+end
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+class Patty < ActiveRecord::Base
+  MEAT_TYPES = [
+    "beef",
+    "chicken",
+    "pork"
+  ]
+
+  belongs_to :double_hamburger
+  validates :meat_type, :inclusion=> { :in => MEAT_TYPES }
+end
+```
+
+In case of validation failures on nested assocciations error messagges will look like this:
+
+```ruby
+{
+  :"patties.0.meat_type" => ["is not included in the list"],
+  :"patties.1.meat_type "=> ["is not included in the list"]
+}
+```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/error_indexer.
+Bug reports and pull requests are welcome on GitHub at https://github.com/okosyk/error_indexer.
 
 ## License
 
